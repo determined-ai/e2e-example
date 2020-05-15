@@ -9,13 +9,13 @@ spec:
     - spec:
         containers:
         - name: classifier
-          image: davidhershey/seldon-example:1.8
+          image: YOUR_DOCKER_IMAGE
     graph:
       children: []
       parameters:
         - name: det_master
           type: STRING
-          value: "http://ec2-35-166-8-221.us-west-2.compute.amazonaws.com:8080/"
+          value: "DET_MASTER_ADDR"
         - name: experiment_id
           type: INT
           value: "1"
