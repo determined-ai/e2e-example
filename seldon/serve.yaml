@@ -1,0 +1,27 @@
+apiVersion: machinelearning.seldon.io/v1alpha2
+kind: SeldonDeployment
+metadata:
+  name: catdog-model
+spec:
+  name: catdog-model
+  predictors:
+  - componentSpecs:
+    - spec:
+        containers:
+        - name: classifier
+          image: davidhershey/seldon-example:1.8
+    graph:
+      children: []
+      parameters:
+        - name: det_master
+          type: STRING
+          value: "http://ec2-35-166-8-221.us-west-2.compute.amazonaws.com:8080/"
+        - name: experiment_id
+          type: INT
+          value: "1"
+      endpoint:
+        type: REST
+      name: classifier
+      type: MODEL
+    name: catdog-model
+    replicas: 1

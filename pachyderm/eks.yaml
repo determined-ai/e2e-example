@@ -1,0 +1,12 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: your-pachyderm-cluster
+  region: us-west-2
+
+nodeGroups:
+  - name: pachyderm-eks-workers
+    labels: { role: workers }
+    instanceType: m5.8xlarge
+    desiredCapacity: 2
