@@ -53,3 +53,31 @@ class CatDogDataset(Dataset):
         label = 0 if img_name.startswith('dog') else 1
         sample = (image, label)
         return sample
+
+
+def download_pach_repo(pachyderm_host, pachyderm_port, repo, branch, root):
+    client = python_pachyderm.Client(host=pachyderm_host, port=pachyderm_port)
+    files = []
+    if not os.path.exists(root):
+        os.makedirs(root)
+    for file in client.walk_file((repo, branch), "/"):
+        files.append(file)
+
+    args = []
+    count = 0
+    fpaths = []
+    for i in range(len(files)):
+        path = files[i].file.path
+        fpath = os.path.join(root, path[1:])
+        if files[i].file_type == 2:
+            os.makedirs(fpath, exist_ok=True)
+        else:
+            fpaths.append((path, fpath))
+    for path, fpath in fpaths:
+        contents = client.get_file((repo, branch), path)
+        f = open(fpath, 'wb')
+        for bytes in contents:
+            f.write(bytes)
+        f.close()
+        if fpath.endswith('.tar.gz'):
+            tarfile.open(fpath).extractall(path=root)

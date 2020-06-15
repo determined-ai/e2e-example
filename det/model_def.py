@@ -11,35 +11,8 @@ from torchvision import models, transforms
 from tqdm import tqdm
 
 
-from data import CatDogDataset, get_test_transforms
+from data import CatDogDataset, get_test_transforms, download_pach_repo
 TorchData = Union[Dict[str, torch.Tensor], Sequence[torch.Tensor], torch.Tensor]
-
-
-def download_pach_repo(client, repo, branch, root):
-    files = []
-    if not os.path.exists(root):
-        os.makedirs(root)
-    for file in client.walk_file((repo, branch), "/"):
-        files.append(file)
-
-    args = []
-    count = 0
-    fpaths = []
-    for i in range(len(files)):
-        path = files[i].file.path
-        fpath = os.path.join(root, path[1:])
-        if files[i].file_type == 2:
-            os.makedirs(fpath, exist_ok=True)
-        else:
-            fpaths.append((path, fpath))
-    for path, fpath in fpaths:
-        contents = client.get_file((repo, branch), path)
-        f = open(fpath, 'wb')
-        for bytes in contents:
-            f.write(bytes)
-        f.close()
-        if fpath.endswith('.tar.gz'):
-            tarfile.open(fpath).extractall(path=root)
 
 
 class CatDogModel(PyTorchTrial):
@@ -49,7 +22,6 @@ class CatDogModel(PyTorchTrial):
         self.data_dir = self.download_data()
 
         self.test_transform = get_test_transforms()
-
 
 
     def build_model(self) -> nn.Module:
@@ -94,7 +66,8 @@ class CatDogModel(PyTorchTrial):
         pachyderm_port = data_config['pachyderm']['port']
         pach_client = python_pachyderm.Client(host=pachyderm_host, port=pachyderm_port)
         download_pach_repo(
-            pach_client,
+            pachyderm_host,
+            pachyderm_port,
             data_config["pachyderm"]["repo"],
             data_config["pachyderm"]["branch"],
             data_dir,
